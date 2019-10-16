@@ -1,26 +1,36 @@
 package chapter5;
 
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class LockThread extends Thread{
+public class LockThread {
 	public static Lock lock = new ReentrantLock();
-	
-	public void get()  {
+	public static Condition condition = lock.newCondition();
+	public static void get()  {
 		try {
-			lock.lockInterruptibly();
-			lock.newCondition();
-			while(true) {}
-		} catch (InterruptedException e) {
+			lock.lock();
+			condition.await();
+			System.out.println("quit");
+			System.out.println(condition);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			lock.unlock();
 		}
 	}
-	@Override
-	public void run() {
+	
+	public static void signal() {
 		// TODO Auto-generated method stub
-		get();
+		lock.lock();
+		try {
+			condition.signal();
+			System.out.println(condition);
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally {
+			lock.unlock();
+		}
 	}
 }
